@@ -4,6 +4,7 @@ import helpers.*;
 import helpers.utils.*;
 import utils.Task;
 import static main.PlankMaker.*;
+import helpers.*;
 import helpers.annotations.AllowedValue;
 import helpers.annotations.ScriptConfiguration;
 import helpers.annotations.ScriptManifest;
@@ -13,6 +14,10 @@ import tasks.*;
 import helpers.AbstractScript;
 import helpers.ScriptCategory;
 
+import helpers.utils.*;
+import utils.Task;
+
+import static main.PlankMaker.*;
 import static helpers.Interfaces.*;
 
 import java.awt.Color;
@@ -54,7 +59,7 @@ public class BankTask extends Task {
         if (!Bank.isOpen()) {
             Logger.debugLog("Opening bank");
             Bank.open(dynamicBank);
-            Condition.wait(Bank::isOpen, 50, 10);
+            Condition.wait(Bank::isOpen, 50, 20);
         }
     }
 
@@ -71,25 +76,33 @@ public class BankTask extends Task {
     }
 
     private void bankItems() {
-        if (!Bank.isSelectedQuantityAllButton()) {
-            Client.tap(Bank.findQuantityAllButton());
-            Condition.wait(Bank::isSelectedQuantityAllButton, 100, 20);
-        }
-        
         // Deposit all items
         Bank.tapDepositInventoryButton();
         //Condition.wait(Inventory::isEmpty, 100, 10);
-        
-        // Withdraw coins if not in inventory
+        Condition.sleep(1000);        
+
+        // Withdraw coins
         if (!Inventory.contains(ItemList.COINS_995, 0.80)) {
+            Bank.tapSearchButton();
+            Condition.sleep(1000);        
+            //Condition.wait(() -> Bank.isSearchOpen(), 100, 10);
+            Client.sendKeystroke("Coins");
             Bank.withdrawItem(ItemList.COINS_995, 0.80);
             Condition.wait(() -> Inventory.contains(ItemList.COINS_995, 0.80), 100, 10);
+            Bank.tapSearchButton(); // Close search
         }
 
         // Withdraw logs
+        Bank.tapSearchButton();
+        Condition.sleep(1000);        
+
+       // Condition.wait(() -> Bank.isSearchOpen(), 100, 10);
+        Client.sendKeystroke(logType);
         Bank.withdrawItem(logItemId, 0.80);
         Condition.wait(() -> Inventory.contains(logItemId, 0.80), 100, 10);
+        Bank.tapSearchButton(); // Close search
 
         Bank.close();
+        Condition.wait(() -> !Bank.isOpen(), 100, 10);
     }
 }

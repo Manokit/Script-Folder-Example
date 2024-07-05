@@ -1,6 +1,5 @@
 package main;
 
-import helpers.*;
 import helpers.annotations.AllowedValue;
 import helpers.annotations.ScriptConfiguration;
 import helpers.annotations.ScriptManifest;
@@ -13,7 +12,6 @@ import helpers.ScriptCategory;
 import helpers.utils.*;
 import utils.Task;
 
-import static main.PlankMaker.*;
 import static helpers.Interfaces.*;
 
 import java.awt.Color;
