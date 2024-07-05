@@ -3,8 +3,6 @@ package main;
 import helpers.annotations.AllowedValue;
 import helpers.annotations.ScriptConfiguration;
 import helpers.annotations.ScriptManifest;
-import helpers.utils.ItemList;
-import helpers.utils.OptionType;
 import tasks.*;
 import helpers.AbstractScript;
 import helpers.ScriptCategory;
@@ -118,15 +116,6 @@ public class PlankMaker extends AbstractScript {
 
     @Override
     public void poll() {
-        if (!GameTabs.isInventoryTabOpen()) {
-            GameTabs.openInventoryTab();
-        }
-
-        //if (hopEnabled && Game.shouldHop()) {
-        //    Game.hop(hopProfile, false, useWDH);
-        //    return;
-        //}
-
         for (Task task : tasks) {
             if (task.activate()) {
                 task.execute();
@@ -134,6 +123,13 @@ public class PlankMaker extends AbstractScript {
             }
         }
     }
+
+        //if (hopEnabled && Game.shouldHop()) {
+        //    Game.hop(hopProfile, false, useWDH);
+        //    return;
+        //}
+
+
 
     
 
