@@ -7,8 +7,6 @@ import static helpers.Interfaces.*;
 
 public class CheckForItems extends Task {
     public static boolean checkedForItems = false;
-    private boolean checkedForCoins = false;
-    private boolean checkedForLogs = false;
 
     @Override
     public boolean activate() {
@@ -24,17 +22,15 @@ public class CheckForItems extends Task {
         }
 
         boolean hasCoins = Inventory.contains(ItemList.COINS_995, 0.80);
-        checkedForCoins = true;
-
         boolean hasLogs = Inventory.contains(logItemId, 0.80);
-        checkedForLogs = true;
 
         if (hasCoins && hasLogs) {
             checkedForItems = true;
+            Logger.log("Required items found in inventory");
             return true;
         } else {
-            Logger.log("Coins or Logs not found, stopping script");
-            Script.stop();
+            Logger.log("Coins or Logs not found in inventory, proceeding to bank");
+            checkedForItems = true;
             return false;
         }
     }
