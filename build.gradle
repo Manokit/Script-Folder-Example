@@ -23,7 +23,7 @@ dependencies {
 }
 
 jar {
-    archiveFileName = 'SampleScript.jar'
+    archiveFileName = 'SharkPlankMaker.jar'
     destinationDirectory = file('jar/')
 
     manifest {
