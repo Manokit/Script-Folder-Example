@@ -116,11 +116,22 @@ public class PlankMaker extends AbstractScript {
 
     @Override
     public void poll() {
+        ensureInventoryOpen();
+
         for (Task task : tasks) {
             if (task.activate()) {
-                task.execute();
-                return;
+                boolean taskCompleted = task.execute();
+                if (taskCompleted) {
+                    break;
+                }
             }
+        }
+    }
+
+    private void ensureInventoryOpen() {
+        if (!GameTabs.isInventoryTabOpen()) {
+            GameTabs.openInventoryTab();
+            Condition.wait(GameTabs::isInventoryTabOpen, 100, 10);
         }
     }
 

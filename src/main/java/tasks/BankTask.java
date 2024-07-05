@@ -29,6 +29,8 @@ import java.util.Random;
 
 public class BankTask extends Task {
     private String dynamicBank = null;
+    private int attemptCount = 0;
+    private static final int MAX_ATTEMPTS = 3;
 
     @Override
     public boolean activate() {
@@ -42,25 +44,33 @@ public class BankTask extends Task {
             Walker.walkPath(PATH_TO_BANK);
             return false;
         }
-        handleBanking();
-        return false;
+        return handleBanking();
     }
 
-    private void handleBanking() {
-        ensureBankIsOpenAndReady();
-        if (Bank.isOpen()) {
-            Logger.log("Banking items!");
-            bankItems();
+    private boolean handleBanking() {
+        if (attemptCount >= MAX_ATTEMPTS) {
+            Logger.log("Failed to open bank after " + MAX_ATTEMPTS + " attempts. Stopping script.");
+            Script.stop();
+            return false;
         }
+
+        if (!Bank.isOpen()) {
+            ensureBankIsOpenAndReady();
+            attemptCount++;
+            return false;
+        }
+
+        Logger.log("Banking items!");
+        bankItems();
+        attemptCount = 0;
+        return true;
     }
 
     private void ensureBankIsOpenAndReady() {
         stepToBank();
-        if (!Bank.isOpen()) {
-            Logger.debugLog("Opening bank");
-            Bank.open(dynamicBank);
-            Condition.wait(Bank::isOpen, 50, 20);
-        }
+        Logger.debugLog("Opening bank");
+        Bank.open(dynamicBank);
+        Condition.wait(Bank::isOpen, 100, 20);
     }
 
     private void stepToBank() {
@@ -78,31 +88,26 @@ public class BankTask extends Task {
     private void bankItems() {
         // Deposit all items
         Bank.tapDepositInventoryButton();
-        //Condition.wait(Inventory::isEmpty, 100, 10);
-        Condition.sleep(1000);        
-
+        Condition.wait(() -> !Inventory.isFull(), 100, 10);
+        
         // Withdraw coins
         if (!Inventory.contains(ItemList.COINS_995, 0.80)) {
-            Bank.tapSearchButton();
-            Condition.sleep(1000);        
-            //Condition.wait(() -> Bank.isSearchOpen(), 100, 10);
-            Client.sendKeystroke("Coins");
-            Bank.withdrawItem(ItemList.COINS_995, 0.80);
-            Condition.wait(() -> Inventory.contains(ItemList.COINS_995, 0.80), 100, 10);
-            Bank.tapSearchButton(); // Close search
+            withdrawItem("Coins", ItemList.COINS_995);
         }
 
         // Withdraw logs
-        Bank.tapSearchButton();
-        Condition.sleep(1000);        
-
-       // Condition.wait(() -> Bank.isSearchOpen(), 100, 10);
-        Client.sendKeystroke(logType);
-        Bank.withdrawItem(logItemId, 0.80);
-        Condition.wait(() -> Inventory.contains(logItemId, 0.80), 100, 10);
-        Bank.tapSearchButton(); // Close search
+        withdrawItem(logType, logItemId);
 
         Bank.close();
         Condition.wait(() -> !Bank.isOpen(), 100, 10);
+    }
+
+    private void withdrawItem(String itemName, int itemId) {
+        Bank.tapSearchButton();
+        //Condition.wait(Bank::isSearchOpen, 100, 10);
+        Client.sendKeystroke(itemName);
+        Bank.withdrawItem(itemId, 0.80);
+        Condition.wait(() -> Inventory.contains(itemId, 0.80), 100, 10);
+        Bank.tapSearchButton(); // Close search
     }
 }
