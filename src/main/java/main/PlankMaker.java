@@ -28,7 +28,7 @@ import java.util.Random;
         description = "Makes planks at the sawmill in the Woodcutting Guild",
         guideLink = "https://tidale.us/",
         version = "1.0",
-        categories = {ScriptCategory.Crafting}
+        categories = {ScriptCategory.Construction}
 )
 @ScriptConfiguration.List(
 {
