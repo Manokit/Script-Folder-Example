@@ -11,14 +11,14 @@ import static helpers.Interfaces.*;
 public class WalkToBankTask extends Task {
     @Override
     public boolean activate() {
-        Tile playerPosition = Walker.getPlayerPosition(WOODCUTTING_GUILD_REGION);
+        Tile playerPosition = Walker.getPlayerPosition();
         return !Inventory.contains(logItemId, 0.80) && !Player.isTileWithinArea(playerPosition, AT_BANK_AREA);
     }
 
     @Override
     public boolean execute() {
         Logger.log("Walking to bank");
-        Walker.walkPath(WOODCUTTING_GUILD_REGION, PATH_TO_BANK);
+        Walker.walkPath(PATH_TO_BANK);
         return false;
     }
 }

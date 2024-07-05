@@ -86,7 +86,7 @@ public class PlankMaker extends AbstractScript {
     public static final Rectangle SAWMILL_OPERATOR_ROI = new Rectangle(61, 41, 600, 485);
     public static final Tile SAWMILL_OPERATOR_TILE = new Tile(630, 819);
     public static final int SAWMILL_INTERFACE_ID = 403; // Verify this
-    public static final RegionBox WOODCUTTING_GUILD_REGION = new RegionBox("WoodcuttingGuild", 0, 0, 0, 0); // Replace with actual coordinates
+    //public static final RegionBox WOODCUTTING_GUILD_REGION = new RegionBox("WoodcuttingGuild", 0, 0, 0, 0); // Replace with actual coordinates
 
     @Override
     public void onStart() {

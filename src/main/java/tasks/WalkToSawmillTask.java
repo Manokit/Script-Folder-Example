@@ -15,7 +15,7 @@ public class WalkToSawmillTask extends Task {
     @Override
     public boolean execute() {
         Logger.log("Walking to sawmill");
-        Walker.walkPath(WOODCUTTING_GUILD_REGION, PATH_TO_SAWMILL);
+        Walker.walkPath(PATH_TO_SAWMILL);
         return false;
     }
 }
