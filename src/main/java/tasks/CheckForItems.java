@@ -21,17 +21,14 @@ public class CheckForItems extends Task {
             Condition.wait(() -> GameTabs.isInventoryTabOpen(), 50, 10);
         }
 
-        boolean hasCoins = Inventory.contains(ItemList.COINS_995, 0.80);
-        boolean hasLogs = Inventory.contains(logItemId, 0.80);
-
-        if (hasCoins && hasLogs) {
-            checkedForItems = true;
-            Logger.log("Required items found in inventory");
-            return true;
-        } else {
-            Logger.log("Coins or Logs not found in inventory, proceeding to bank");
-            checkedForItems = true;
-            return false;
+        if (GameTabs.isInventoryTabOpen()) {
+            boolean hasCoins = Inventory.contains(ItemList.COINS_995, 0.80);
+            boolean hasLogs = Inventory.contains(logItemId, 0.80);
+                if (hasCoins && hasLogs) {
+                checkedForItems = true;
+                return true;
+            }
         }
+        return false;
     }
 }
