@@ -4,7 +4,6 @@ import helpers.*;
 import helpers.utils.*;
 import utils.Task;
 import static main.PlankMaker.*;
-import helpers.*;
 import helpers.annotations.AllowedValue;
 import helpers.annotations.ScriptConfiguration;
 import helpers.annotations.ScriptManifest;
@@ -88,7 +87,7 @@ public class BankTask extends Task {
     private void bankItems() {
         // Deposit all items
         Bank.tapDepositInventoryButton();
-        Condition.wait(() -> !Inventory.isFull(), 100, 10);
+        Condition.wait(() -> Inventory.emptySlots() == 28, 100, 10);
         
         // Withdraw coins
         if (!Inventory.contains(ItemList.COINS_995, 0.80)) {
@@ -104,7 +103,7 @@ public class BankTask extends Task {
 
     private void withdrawItem(String itemName, int itemId) {
         Bank.tapSearchButton();
-        //Condition.wait(Bank::isSearchOpen, 100, 10);
+        Condition.wait(Bank::isSearchOpen, 100, 10);
         Client.sendKeystroke(itemName);
         Bank.withdrawItem(itemId, 0.80);
         Condition.wait(() -> Inventory.contains(itemId, 0.80), 100, 10);

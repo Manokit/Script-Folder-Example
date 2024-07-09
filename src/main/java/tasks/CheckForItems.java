@@ -24,11 +24,12 @@ public class CheckForItems extends Task {
         if (GameTabs.isInventoryTabOpen()) {
             boolean hasCoins = Inventory.contains(ItemList.COINS_995, 0.80);
             boolean hasLogs = Inventory.contains(logItemId, 0.80);
-                if (hasCoins && hasLogs) {
+            if (hasCoins && hasLogs) {
                 checkedForItems = true;
                 return true;
             }
         }
+        checkedForItems = true; // Ensure this is set to true to prevent repeated checks
         return false;
     }
 }
