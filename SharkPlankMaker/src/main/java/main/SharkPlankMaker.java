@@ -154,8 +154,10 @@ public class SharkPlankMaker extends AbstractScript {
     
     private void initialSetup() {
         // Open bank 
-        Walker.step(bankTile);
-        Bank.open(WOODCUTTING_GUILD);
+        while(!Player.atTile(bankTile)) {
+            Walker.step(bankTile);
+        }
+        Bank.open(WOODCUTTING_GUILD); 
         
         // Enter pin if needed
         if (Bank.isBankPinNeeded()) {
@@ -201,7 +203,7 @@ public class SharkPlankMaker extends AbstractScript {
     private void walkToSawmill() {
         Logger.log("Walking to sawmill...");
         Walker.walkPath(pathToSawmill);
-        Condition.sleep(generateDelay(100,300));
+        //Condition.sleep(generateDelay(100,300));
         Walker.step(sawmillTile);
         Condition.wait(() -> Player.atTile(sawmillTile), 250, 20);   
     }
@@ -251,7 +253,7 @@ public class SharkPlankMaker extends AbstractScript {
         // Walk back to bank
         Logger.log("Finished processing. Returning to bank...");
         Walker.walkPath(pathToBank);
-        Condition.sleep(generateDelay(100, 300));
+        //Condition.sleep(generateDelay(100, 300));
         Walker.step(bankTile);
         Condition.wait(() -> Player.atTile(bankTile), 250, 20);
     }
@@ -265,6 +267,7 @@ public class SharkPlankMaker extends AbstractScript {
             Bank.tapQuantityAllButton();
         }
         Inventory.tapItem(processedItemID, 0.80);
+        //Condition.wait(() -> !Inventory.contains(processedItemID, 0.9), 200, 100);
 
         // Withdraw more logs and coins
         Bank.withdrawItem(unprocessedItemID, 0.9); 
