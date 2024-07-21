@@ -16,6 +16,8 @@ import java.util.Map;
 import utils.*;
 import java.util.Random;
 
+import static helpers.utils.BankNames.*;
+
 import static helpers.Interfaces.*;
 
 @ScriptManifest(
@@ -83,6 +85,7 @@ public class SharkPlankMaker extends AbstractScript {
     
     Rectangle searchArea = new Rectangle(384, 242, 24, 48);
     RegionBox sawmillMan = new RegionBox("REGIONBOXNAME", 379, 234, 417, 295);
+    Tile bankTile = new Tile(587, 852);
     
     Tile[] pathToSawmill = new Tile[] {
         new Tile(587, 852),
@@ -145,17 +148,18 @@ public class SharkPlankMaker extends AbstractScript {
     
     private void setupBanking() {
         // Find nearest bank and set as banking location
-        bankloc = Bank.setupDynamicBank();
+        //bankloc = Bank.setupDynamicBank();
         
-        if (bankloc == null) {
-            Logger.log("No bank found nearby. Stopping script.");
-            Script.stop();
+        //if (bankloc == null) {
+        //    Logger.log("No bank found nearby. Stopping script.");
+        //    Script.stop();
         }
-    }
+    
     
     private void initialSetup() {
         // Open bank 
-        Bank.open(bankloc);
+        Walker.step(bankTile);
+        Bank.open(WOODCUTTING_GUILD);
         
         // Enter pin if needed
         if (Bank.isBankPinNeeded()) {
@@ -196,7 +200,7 @@ public class SharkPlankMaker extends AbstractScript {
     private void walkToSawmill() {
         Logger.log("Walking to sawmill...");
         Walker.walkPath(pathToSawmill);
-        Condition.sleep(generateDelay(1500,2500));
+        Condition.sleep(generateDelay(100,300));
         Walker.step(sawmillTile);
         Condition.wait(() -> Player.atTile(sawmillTile), 250, 20);   
     }
@@ -208,7 +212,11 @@ public class SharkPlankMaker extends AbstractScript {
         if (!operator.isEmpty()) {
             // Open sawmill interface
             Logger.log("Found sawmill operator. Converting logs to planks...");
-            Client.tap(operator.get(0));
+            //Client.tap(operator.get(0));
+            Point operatorPoint = operator.get(0);
+            Client.longPress(operatorPoint.x, operatorPoint.y);
+            Condition.sleep(generateDelay(500,1000));
+            Client.tap(380, 333);
             Condition.wait(() -> Chatbox.isMakeMenuVisible(), 200, 20);
             
             // Select log type
@@ -243,7 +251,7 @@ private void walkToBank() {
     
     private void bank() {
         // Open bank 
-        Bank.open(bankloc);
+        Bank.open(WOODCUTTING_GUILD);
         
         // Deposit planks
         Bank.tapDepositInventoryButton();
