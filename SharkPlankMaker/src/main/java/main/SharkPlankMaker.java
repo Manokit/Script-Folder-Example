@@ -7,11 +7,14 @@ import helpers.annotations.ScriptManifest;
 import helpers.utils.OptionType;
 import helpers.utils.RegionBox;
 import helpers.utils.Tile;
+import helpers.utils.Area;
 
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import utils.*;
+import java.util.Random;
 
 import static helpers.Interfaces.*;
 
@@ -57,30 +60,37 @@ public class SharkPlankMaker extends AbstractScript {
     String logType;  
     String bankloc;
     int banktab;
-    String coins = "995";
+    String coins = "1004";
     String unprocessedItemID;
     String processedItemID;
     Map<String, String[]> itemIDs;
     RegionBox woodcuttingGuildRegion = new RegionBox("WoodcuttingGuild", 1695, 2427, 1938, 2607);
+    Tile sawmillTile = new Tile(630, 820);
+    public static Area sawmillArea = new Area(new Tile(587, 852), new Tile(630, 820));
 
+    // Random number generator
+    Random random = new Random();
 
     List<Color> operatorColors = Arrays.asList(
-        Color.decode("#7f7b76"),
-        Color.decode("#deac82"), 
-        Color.decode("#43301f")
+        Color.decode("#d6a074"),
+        Color.decode("#3a3309"), 
+        Color.decode("#8db2b4"),
+        Color.decode("#57573a"),
+        Color.decode("#bad5d7"),
+        Color.decode("#857f7a"),
+        Color.decode("#6f6c68")
     );
     
-    Rectangle searchArea = new Rectangle(50, 50, 400, 300);
+    Rectangle searchArea = new Rectangle(384, 242, 24, 48);
+    RegionBox sawmillMan = new RegionBox("REGIONBOXNAME", 379, 234, 417, 295);
     
-    Tile[] pathToSawmill = {
+    Tile[] pathToSawmill = new Tile[] {
         new Tile(587, 852),
-        new Tile(585, 846),
-        new Tile(589, 845),
-        new Tile(598, 823),
-        new Tile(610, 822),
-        new Tile(615, 818), 
-        new Tile(630, 818),
-        new Tile(630, 819)
+        new Tile(588, 833),
+        new Tile(599, 823),
+        new Tile(608, 823),
+        new Tile(622, 819),
+        new Tile(630, 820)
     };
 
     @Override
@@ -157,16 +167,22 @@ public class SharkPlankMaker extends AbstractScript {
             Bank.openTab(banktab); 
         }
         
+        Bank.tapQuantityAllButton();
+        Condition.wait(() -> Bank.isSelectedQuantityAllButton(), 200, 12);
+
+        Bank.withdrawItem("1004", 0.8);
+        Condition.wait(() -> Inventory.contains(coins, 0.8), 200, 12);
         // Set custom withdraw quantity to 27
-        Bank.tapQuantityCustomButton();
-        Client.sendKeystroke("27");
+        //Bank.tapQuantityCustomButton();
+        //Client.sendKeystroke("27");
         
         // Withdraw logs and coins  
-        Bank.withdrawItem("[995-1004,617]", 0.8);
         Bank.withdrawItem(unprocessedItemID, 0.8);
+        Condition.wait(() -> Inventory.contains(unprocessedItemID, 0.8), 200, 12);
         
         // Close bank
         Bank.close();
+        
     }
     
     private void checkInventory() {
@@ -178,16 +194,16 @@ public class SharkPlankMaker extends AbstractScript {
     }
     
     private void walkToSawmill() {
-        // Walk to sawmill if not already there
-        if (!Client.isColorAtPoint(operatorColors.get(0), searchArea.getLocation(), 10)) {
-            Logger.log("Walking to sawmill...");
-            Walker.walkPath(woodcuttingGuildRegion, pathToSawmill);
-        }
+        Logger.log("Walking to sawmill...");
+        Walker.walkPath(pathToSawmill);
+        Condition.sleep(generateDelay(1500,2500));
+        Walker.step(sawmillTile);
+        Condition.wait(() -> Player.atTile(sawmillTile), 250, 20);   
     }
   
     private void processLogs() {
         // Find sawmill operator 
-        List<Point> operator = Client.getPointsFromColorsInRect(operatorColors, searchArea, 10);
+        List<Point> operator = Client.getPointsFromColorsInRect(operatorColors, searchArea, 4);
         
         if (!operator.isEmpty()) {
             // Open sawmill interface
@@ -233,7 +249,7 @@ private void walkToBank() {
         Bank.tapDepositInventoryButton();
         
         // Withdraw more logs and coins
-        Bank.withdrawItem("[995-1004,617]", 0.9);
+        Bank.withdrawItem("1004", 0.9);
         Bank.withdrawItem(unprocessedItemID, 0.9); 
         
         // Close bank  
@@ -245,5 +261,14 @@ private void walkToBank() {
         if (hopEnabled) {
             Game.hop(hopProfile, false, false);
         }
+    }
+
+    private int generateDelay(int min, int max) {
+        if (min > max) {
+            int temp = min;
+            min = max;
+            max = temp;
+        }
+        return random.nextInt(max - min + 1) + min;
     }
 }
