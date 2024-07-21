@@ -8,6 +8,7 @@ import helpers.utils.OptionType;
 import helpers.utils.RegionBox;
 import helpers.utils.Tile;
 import helpers.utils.Area;
+import helpers.utils.ItemList;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -147,12 +148,7 @@ public class SharkPlankMaker extends AbstractScript {
     }
     
     private void setupBanking() {
-        // Find nearest bank and set as banking location
-        //bankloc = Bank.setupDynamicBank();
-        
-        //if (bankloc == null) {
-        //    Logger.log("No bank found nearby. Stopping script.");
-        //    Script.stop();
+
         }
     
     
@@ -165,13 +161,18 @@ public class SharkPlankMaker extends AbstractScript {
         if (Bank.isBankPinNeeded()) {
             Bank.enterBankPin();
         }
+
+        //empty inventory just in case
+        Bank.tapDepositInventoryButton();
         
         // Set correct bank tab
         if (!Bank.isSelectedBankTab(banktab)) {
             Bank.openTab(banktab); 
         }
         
-        Bank.tapQuantityAllButton();
+        if (!Bank.isSelectedQuantityAllButton()) {
+            Bank.tapQuantityAllButton();
+        }
         Condition.wait(() -> Bank.isSelectedQuantityAllButton(), 200, 12);
 
         Bank.withdrawItem("1004", 0.8);
@@ -240,24 +241,32 @@ public class SharkPlankMaker extends AbstractScript {
         }
     }
     
-private void walkToBank() {    
-    // Define the bank tile coordinates
-    Tile bankTile = new Tile(587, 852);
+    private void walkToBank() {    
+        // Reverse the pathToSawmill array
+        Tile[] pathToBank = new Tile[pathToSawmill.length];
+        for (int i = 0; i < pathToSawmill.length; i++) {
+            pathToBank[i] = pathToSawmill[pathToSawmill.length - 1 - i];
+        }
     
-    // Walk back to bank
-    Logger.log("Finished processing. Returning to bank...");
-    Walker.walkTo(bankTile, woodcuttingGuildRegion);
-}
+        // Walk back to bank
+        Logger.log("Finished processing. Returning to bank...");
+        Walker.walkPath(pathToBank);
+        Condition.sleep(generateDelay(100, 300));
+        Walker.step(bankTile);
+        Condition.wait(() -> Player.atTile(bankTile), 250, 20);
+    }
     
     private void bank() {
         // Open bank 
         Bank.open(WOODCUTTING_GUILD);
         
         // Deposit planks
-        Bank.tapDepositInventoryButton();
-        
+        if (!Bank.isSelectedQuantityAllButton()) {
+            Bank.tapQuantityAllButton();
+        }
+        Inventory.tapItem(processedItemID, 0.80);
+
         // Withdraw more logs and coins
-        Bank.withdrawItem("1004", 0.9);
         Bank.withdrawItem(unprocessedItemID, 0.9); 
         
         // Close bank  
